@@ -1,0 +1,110 @@
+/* =============================================
+   TP3 - Especificidad CSS
+   =============================================
+
+   REFERENCIA DE ESPECIFICIDADES YA EXISTENTES EN EL <style> INTERNO:
+   ─────────────────────────────────────────────────────────────────────
+   h1                    → (0,0,1)   ← define text-align: left
+   p                     → (0,0,1)   ← define font-family: sans-serif
+   #primer-parrafo       → (1,0,0)   ← define background-color: #eec
+   p.importante em       → (0,1,1)   ← define color: #144 en <em>
+   p.novelas a           → (0,1,1)   ← define outline: none
+   body p.fuente.parrafo → (0,2,1) + !important ← define color, opacity
+   ============================================= */
+
+
+/* ── 1. Centrar el <h1> ──────────────────────────────────────────────
+   El estilo interno tiene: h1 { text-align: left }  → especificidad (0,0,1)
+   Uso el selector de clase .titulo para ganar con (0,1,0) > (0,0,1).       */
+.titulo {
+    text-align: center;
+}
+
+
+/* ── 2. Fuente con serifas para todos los párrafos ───────────────────
+   El estilo interno tiene: p { font-family: sans-serif } → (0,0,1)
+   Para superarlo necesito especificidad mayor. Uso body p → (0,0,2).        */
+body p {
+    font-family: serif;
+}
+
+
+/* ── 3. Fondo #CEE al elemento #primer-parrafo ───────────────────────
+   El estilo interno tiene: #primer-parrafo { background-color: #eec } → (1,0,0)
+   Para ganar necesito al menos (1,0,1) o (1,1,0).
+   Uso article#primer-parrafo → (1,0,1) > (1,0,0).                          */
+article#primer-parrafo {
+    background-color: #CEE;
+}
+
+
+/* ── 4. Color #933 para los <em> del primer párrafo ─────────────────
+   El estilo interno tiene: p.importante em { color: #144 } → (0,1,1)
+   Para ganar necesito especificidad mayor, como (1,0,1) o (0,2,1).
+   Uso #primer-parrafo em → (1,0,1) > (0,1,1).                              */
+#primer-parrafo em {
+    color: #933;
+}
+
+
+/* ── 5. Outline en todos los links ──────────────────────────────────
+   El estilo interno tiene: p.novelas a { outline: none } → (0,1,1)
+   Para ganar necesito (0,2,0) o más. Uso #contenedor a → (1,0,1) > (0,1,1).
+   Nota: los links de p.fuente están fuera de #contenedor, así que
+   los cubrimos también con el selector body > p a → (0,0,2).               */
+#contenedor a {
+    outline: 1px solid #333;
+}
+
+body > p a {
+    outline: 1px solid #333;
+}
+
+
+/* ── 6. Opacidad 100% para p.fuente ─────────────────────────────────
+   El estilo interno tiene: body p.fuente.parrafo { opacity: 50% } → (0,2,1)
+   Debo superarlo con (0,3,1) o más sin usar !important.
+   Uso body p.fuente.parrafo.parrafo (repitiendo la clase no suma, pero
+   puedo encadenar clases existentes): el elemento tiene las clases
+   "fuente" y "parrafo", nada más. Entonces sumo el elemento body:
+   html body p.fuente.parrafo → (0,2,2) > (0,2,1). ✓                        */
+html body p.fuente.parrafo {
+    opacity: 100%;
+}
+
+
+/* ── 7. Fondo rgba(190,120,240,0.6) en párrafos sin id ──────────────
+   Los párrafos sin id son p.novelas y p.fuente.
+   Uso la pseudo-clase :not() para excluir el que tiene id.
+   p:not(#primer-parrafo) → (1,0,1) — suficiente ya que no hay
+   ninguna regla previa que defina background-color en esos párrafos.        */
+p:not(#primer-parrafo) {
+    background-color: rgba(190, 120, 240, 0.6);
+}
+
+
+/* =============================================
+   BONUS TRACKS
+   ============================================= */
+
+/* ── B1. Color #000 para el texto de p.fuente ────────────────────────
+   El estilo interno tiene: body p.fuente.parrafo { color: #bbb !important } → (0,2,1) + !important
+   Un !important solo puede ser vencido por otro !important de igual o mayor
+   especificidad, o por una regla en el mismo bloque de declaraciones con
+   mayor especificidad también marcada con !important.
+   No hay alternativa aquí: es el único caso donde el uso de !important
+   está justificado por una regla preexistente que también lo usa.           */
+html body p.fuente.parrafo {
+    color: #000 !important;
+}
+
+
+/* ── B2. .complicado en negrita y color #C62 ─────────────────────────
+   El elemento tiene un style inline: style="color: #622"
+   Los estilos inline tienen especificidad (1,0,0,0) — la más alta posible
+   sin !important. No hay forma de superarlos sin !important.
+   Este es el segundo caso donde su uso está justificado.                    */
+.complicado {
+    font-weight: bold;
+    color: #C62 !important;
+}
